@@ -1,9 +1,10 @@
 <?php
 
-use App\Http\Controllers\ListingController;
+use App\Models\Listing;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Models\Listing;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\ListingController;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,33 +30,61 @@ use App\Models\Listing;
 Route::get('/', [ListingController::class , 'index']);
 
 
+// here for prevent access to pages for not authenticated user just add ->middleware('auth'); 
+// and for not letting logged in user access to register page we just add ->middleware('guest');
 
 // Show Create Form
-Route::get('/listings/create', [ListingController::class , 'create']);
+Route::get('/listings/create', [ListingController::class , 'create'])->middleware('auth');
 
 // Store Listing Data
-Route::post('/listings', [ListingController::class , 'store']);
+Route::post('/listings', [ListingController::class , 'store'])->middleware('auth');;
 
+// Manage Listing
+Route::get('/listings/manage', [ListingController::class , 'manage'])->middleware('auth');
+
+// Store Listing Data
+//Route::post('/listings', [ListingController::class , 'store'])->middleware('auth');
 
 // Show Edit Form
-Route::get('/listings/{listing}/edit', [ListingController::class , 'edit']);
+Route::get('/listings/{listing}/edit', [ListingController::class , 'edit'])->middleware('auth');;
 
 
 // Update Single Listing
-Route::put('/listings/{listing}', [ListingController::class , 'update']);
+Route::put('/listings/{listing}', [ListingController::class , 'update'])->middleware('auth');;
 
 // Delete Single Listing
-Route::delete('/listings/{listing}', [ListingController::class , 'destroy']);
+Route::delete('/listings/{listing}', [ListingController::class , 'destroy'])->middleware('auth');;
+
+
 
 // Show single listing
 Route::get('/listings/{listing}', [ListingController::class , 'show']);
+
+
+// Show register/create form
+Route::get('/register', [UserController::class , 'create'])->middleware('guest');
+
+// Create New User
+Route::post('/users', [UserController::class , 'store'])->middleware('guest');
+
+// Log User Out
+Route::post('/logout', [UserController::class , 'logout'])->middleware('auth');
+
+// Show Login Form
+// in middleware folder Authentication you can specify where to redirect user by giving a name to the route you want to be redirected ->name('login')
+// also to redirect already logged in users we need to specify home redirect address in Providers/RouteServiceProvider.php in our case is just '/'
+Route::get('/login', [UserController::class , 'login'])->name('login')->middleware('guest');
+
+// Login  User
+Route::post('/users/login', [UserController::class , 'authenticate']);
+
 
 
 
 // codes just for learning and reminder
 
 
-// this could be replaced by the next function laravel automatically will find listing that way
+// this could be replaced by the next function Laravel automatically will find listing that way
 
 // Route::get('/listings/{id}', function ($id) {
     

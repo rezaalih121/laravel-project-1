@@ -15,6 +15,10 @@ class CreateListingsTable extends Migration
     {
         Schema::create('listings', function (Blueprint $table) {
             $table->id();
+            // creating relationship between user and listing 
+            // cascade means here that if a user deleted all the listings created by this user also will be deleted
+            // do not forget to define the relationship in th Listing model also in User model
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('title');
             $table->string('logo')->nullable();
             $table->string('tags');

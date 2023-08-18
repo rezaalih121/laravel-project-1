@@ -13,7 +13,7 @@ class Listing extends Model
     // but we also could just disable this protection option in the Provider/AppServiceProvider.php file and in boot() function add this
     // Model::unguard();
     
-    protected $fillable = ['title', 'logo' , 'company' , 'location' , 'website' , 'email' ,'tags' , 'description' ];
+    protected $fillable = ['user_id' , 'title', 'logo' , 'company' , 'location' , 'website' , 'email' ,'tags' , 'description' ];
     public function scopeFilter($query, array $filters){
         //dd($filters['tag']);
 
@@ -27,5 +27,10 @@ class Listing extends Model
             ->orWhere('tags','like', '%' . request('search') . '%')
             ->orWhere('company','like', '%' . request('search') . '%');
         }
+    }
+    // Relationship to user
+
+    public function user(){
+        return $this->belongsTo(User::class, 'user_id');
     }
 } 

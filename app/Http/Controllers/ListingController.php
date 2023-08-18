@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Listing;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -84,6 +85,8 @@ class ListingController extends Controller
         if ($request->hasFile('logo')) {
             $formFields['logo'] = $request->file('logo')->store('logos', 'public');
         }
+        // adding user_id to created Listing by current user
+        $formFields['user_id'] = auth()->id();
 
         // for protection reasons in Laravel we need to add a $fillable variable in the Listing model containing the list of properties which are allowed to be inserted
         // but we also could just disable this protection option in the Provider/AppServiceProvider.php file and in boot() function add this
@@ -108,6 +111,12 @@ class ListingController extends Controller
 
         //dd($request->file('logo'));
 
+        // Make sure logged in user is owner
+
+        if($listing->user_id != auth()->id()){
+            abort(403, 'Unauthorized Action');
+        }
+
         $formFields = $request->validate([
             "title" => 'required',
             "company" => ['required'],
@@ -122,6 +131,7 @@ class ListingController extends Controller
             $formFields['logo'] = $request->file('logo')->store('logos', 'public');
         }
 
+
         $listing->update($formFields);
         // to show a message we need to create a component to for it
         return back()->with('message', 'Listing updated successfully!!!');
@@ -130,9 +140,21 @@ class ListingController extends Controller
 
     // Delete Listing
     public function destroy(Listing $listing){
-        $listing->delete();
-        return redirect('/')->with('message', 'Listing deleted successfully');
 
+         // Make sure logged in user is owner
+
+         if($listing->user_id != auth()->id()){
+            abort(403, 'Unauthorized Action');
+        }
+        
+        $listing->delete();
+        return redirect('/listings/manage')->with('message', 'Listing deleted successfully');
+
+    }
+
+    // Manage Listing
+    public function manage(){
+        return view('listings.manage' , ['listings' => auth()->user()->listings()->get() ]);
     }
 
 }
