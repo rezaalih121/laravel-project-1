@@ -9,6 +9,20 @@
         <p class="mb-4">Edit : {{$listing->title}}</p>
     </header>
 
+    <div class="m-auto pt-20">
+        @if ($errors->any())
+
+            <div class="bg-red-500 text-white font-bold rounded-t px-4 py-2">
+                Somthing went wrong ...
+            </div>
+            <ul class="border border-t-0 border-red-400 rounded-b bg-red-100 px-4 py-2 text-red-700">
+                @foreach ( $errors->all() as $error )
+                    <li>{{$error}}</li>
+                @endforeach
+            </ul>
+            
+        @endif
+    </div>
     <form method="POST" action="/listings/{{$listing->id}}" enctype="multipart/form-data">
         @csrf
         @method('PUT')

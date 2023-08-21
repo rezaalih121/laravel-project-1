@@ -16,6 +16,13 @@ use App\Http\Controllers\ListingController;
 | contains the "web" middleware group. Now create something great!
 |
 */
+
+//  composer require barryvdh/laravel-debugbar --dev
+// this debug bar is very useful to monitor your project you need to add provider class to the config/app.php
+// then by using this code it will automatically create standard resources Routes Route::resource('/', ListingController::class);
+
+
+
 // Common Resource Routes:
     // index - Show all listings
     // show - Show single listing

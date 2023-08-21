@@ -4,11 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Models\Listing;
 use App\Models\User;
+use Barryvdh\Debugbar\Facades\Debugbar;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
 class ListingController extends Controller
 {
+    // you could use this command which will automatically create standard CRUD functions 
+    // php artisan make:controller ListingController --resource
 
     // Common Resource Routes:
     // index - Show all listings
@@ -42,6 +45,7 @@ class ListingController extends Controller
         // to customize pagination styles or any other features you use this command to first publish it to access the codes and customize it
         // php artisan vendor:publish
         // you need to set it in AppServiceProvider files look here : https://laravel.com/docs/10.x/pagination
+        Debugbar::startMeasure('Info!');
 
         return view('listings.index', [
             'listings' => Listing::latest()->filter(request((['tag', 'search'])))->paginate(7),
@@ -63,15 +67,19 @@ class ListingController extends Controller
     }
 
     // Store Listing Data
+    // you could use manual Requests like this
+    //public function store(ListingRequest $request)
     public function store(Request $request)
     {
         //dd($request->all());
 
         //dd($request->file('logo'));
 
+        //$formFields = $request->validated()
         $formFields = $request->validate([
             "title" => 'required',
             "company" => ['required', Rule::unique('listings', 'company')],
+            // Or like this ="company" => ['required|unique:listings,company|max:255'],
             "location" => 'required',
             "website" => 'required',
             "tags" => 'required',
@@ -119,7 +127,8 @@ class ListingController extends Controller
 
         $formFields = $request->validate([
             "title" => 'required',
-            "company" => ['required'],
+            // unique:Listing,company,' . $listing] this means company should be unique except current Listing 
+            "company" => 'required|max:255|unique:listings,company,' . $listing->id,
             "location" => 'required',
             "website" => 'required',
             "tags" => 'required',
@@ -148,6 +157,10 @@ class ListingController extends Controller
         }
         
         $listing->delete();
+
+        // you can also use this 
+        //Listing::destroy($listing->id); 
+
         return redirect('/listings/manage')->with('message', 'Listing deleted successfully');
 
     }
